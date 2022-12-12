@@ -6,8 +6,9 @@ const morgan = require("morgan");
 const cors = require("cors");
 //custom package
 const { DBURL, PORT } = require("./app/comman/config");
-const route = require("./app/modules/user/UserRoute");
+const userRoute = require("./app/modules/user/UserRoute");
 const { errorMiddleware } = require("./app/comman/middleware");
+const otpRoute = require("./app/modules/otp/OTPRoute");
 //connecting with mongodb
 mongoose
   .connect(DBURL, {
@@ -40,7 +41,9 @@ app.get("/", (req, res) => {
 });
 
 //user routes
-app.use("/user", route);
+app.use("/user", userRoute);
+// otp routes
+app.use("/otp", otpRoute);
 
 //error middleware
 app.use(errorMiddleware);
