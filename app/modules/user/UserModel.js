@@ -28,7 +28,7 @@ const UserSchema = new Schema({
     required: [true, "Please Enter a Valid Password"],
   },
 });
-
+// UserSchema.createIndex( { "createdAt": 1 }, { expireAfterSeconds: 3600 } )
 UserSchema.pre("save", async function save(next) {
   if (!this.isModified("password")) return next();
 

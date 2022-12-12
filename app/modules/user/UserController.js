@@ -3,6 +3,13 @@ const jwt = require("jsonwebtoken");
 const { JWT_STRING } = require("../../comman/config");
 const bcrypt = require("bcrypt");
 
+//twilio modules
+const {
+  TWILIO_ACCOUNT_SID,
+  TWILIO_AUTH_TOKEN,
+} = require("../../comman/config");
+const client = require("twilio")(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+
 module.exports.insertUser = async (req, res, next) => {
   const { email, name, phoneNo, countryCode, password } = req.body;
   if (!email || !name || !phoneNo || !countryCode || !password) {
@@ -156,6 +163,35 @@ module.exports.login = async (req, res, next) => {
       expiresIn: "4000s",
     });
     return res.status(200).json({ user, token: generatedTokken });
+  } catch (err) {
+    next(err);
+  }
+};
+module.exports.sentSms = async (req, res, next) => {
+  const { email } = req;
+  try {
+    const userNumber = await UserModel.findOne(
+      { email },
+      { phoneNo: 1, countryCode: 1, name: 1, _id: 0 }
+    );
+    if (!userNumber) {
+      return res.status(403).json({ msg: "no user found" });
+    }
+    // userNumber:{phoneNo:1,countryCode:1}
+    const { name, phoneNo, countryCode } = userNumber;
+    const number = countryCode.concat(phoneNo);
+    console.log(number);
+    const sentSms = await client.messages.create({
+      body: `Hello ${name}! your otp is ${Math.round(
+        1000 + Math.random() * 9000
+      )}`,
+      from: "+12075699256",
+      to: number,
+    });
+    return res.status(200).json({
+      msg: "success",
+      sentSms,
+    });
   } catch (err) {
     next(err);
   }

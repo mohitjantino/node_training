@@ -6,6 +6,7 @@ const {
   updateUser,
   deleteUser,
   login,
+  sentSms,
 } = require("./UserController");
 const { tokenChecker } = require("../../comman/middleware");
 
@@ -24,5 +25,8 @@ Route.delete("/delete/:id", deleteUser);
 
 //login user
 Route.post("/login", login);
+
+//sending SMS to user
+Route.post("/sms", tokenChecker, sentSms);
 
 module.exports = Route;
